@@ -1,0 +1,17 @@
+---
+- name: Join cluster members
+  shell: "gluster peer probe {{ item }}"
+  register: gluster_peering
+  changed_when: "'already in peer list' not in gluster_peering.stdout"
+  with_items:
+    - "{{ glusterfs_cluster_members }}"
+
+- name: Create and start the volumes
+  gluster_volume:
+    state: started
+    name: "{{ item.name }}"
+    bricks: "{{ item.bricks }}"
+    cluster: "{{ [inventory_hostname] + glusterfs_cluster_members }}"
+    force: yes
+  with_items:
+    - "{{ glusterfs_volumes }}"

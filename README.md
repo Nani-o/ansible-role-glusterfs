@@ -39,6 +39,15 @@ glusterfs_cluster_members:
   - gfs-member-3
 ```
 
+- glusterfs_volumes
+
+List of hash containing the configuration for a volume. They will be created and started.
+
+```YAML
+glusterfs_volumes:
+  - name: vol1
+    bricks: /bricks/brick1/gv1
+```
 
 Example Playbook
 ----------------
