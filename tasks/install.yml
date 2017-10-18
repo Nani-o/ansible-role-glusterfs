@@ -1,0 +1,19 @@
+---
+- block:
+  - name: Install the repository
+    yum:
+      name: centos-release-gluster312
+
+  - name: Install the packages
+    yum:
+      name: "{{ item }}"
+      state: latest
+    with_items:
+      - glusterfs
+      - glusterfs-cli
+      - glusterfs-libs
+      - glusterfs-server
+
+  tags:
+    - glusterfs
+    - glusterfs_install
