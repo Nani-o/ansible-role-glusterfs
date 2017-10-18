@@ -1,5 +1,5 @@
 glusterfs
-==========
+=========
 
 This role helps to install and manage glusterfs volumes.
 His main purposes are :
@@ -19,7 +19,17 @@ Compatibility
 Role Variables
 --------------
 
-Variables
+- glusterfs_cluster_members
+
+List of all members of the cluster members, except the one you apply the role which is considered as the master.
+They need to be valid Ansible asset in the inventory for the role to apply modifications on them.
+
+```YAML    
+glusterfs_cluster_members:
+  - gfs-member-2
+  - gfs-member-3
+```
+
 
 Example Playbook
 ----------------

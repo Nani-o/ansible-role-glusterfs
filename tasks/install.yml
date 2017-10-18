@@ -1,19 +1,24 @@
 ---
-- block:
+- name: Installation of glusterfs on the main nodes and cluster members
+  block:
+
   - name: Install the repository
     yum:
       name: centos-release-gluster312
 
   - name: Install the packages
     yum:
-      name: "{{ item }}"
+      name:
+        - glusterfs
+        - glusterfs-cli
+        - glusterfs-libs
+        - glusterfs-server
       state: latest
-    with_items:
-      - glusterfs
-      - glusterfs-cli
-      - glusterfs-libs
-      - glusterfs-server
 
+  with_items:
+    - "{{ inventory_hostname }}"
+    - "{{ glusterfs_cluster_members }}"
+  delegate_to: "{{ item }}"
   tags:
     - glusterfs
     - glusterfs_install
