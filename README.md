@@ -19,6 +19,15 @@ Compatibility
 Role Variables
 --------------
 
+- glusterfs_master
+
+A boolean that I add for security. It only mean that the host is the "main node" of a cluster and will hold all the configurations for the other hosts.
+It needs to be set to true for the role to apply.
+
+```YAML
+glusterfs_master: true
+```
+
 - glusterfs_cluster_members
 
 List of all members of the cluster members, except the one you apply the role which is considered as the master.
