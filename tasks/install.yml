@@ -25,6 +25,9 @@
     notify:
       - restart glusterd
 
+  - name: Flush handlers
+    meta: flush_handlers
+
   tags:
     - glusterfs
     - glusterfs_install
