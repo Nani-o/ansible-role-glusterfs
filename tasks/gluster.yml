@@ -5,13 +5,30 @@
   changed_when: "'already in peer list' not in gluster_peering.stdout"
   with_items:
     - "{{ glusterfs_cluster_members }}"
+  tags:
+    - glusterfs
+    - glusterfs_volumes
 
-- name: Create and start the volumes
+- name: Create the replicas volumes
   gluster_volume:
-    state: started
+    state: present
     name: "{{ item.name }}"
     bricks: "{{ item.bricks }}"
     cluster: "{{ [inventory_hostname] + glusterfs_cluster_members }}"
+    replicas: "{{ ([inventory_hostname] + glusterfs_cluster_members) | length }}"
     force: yes
   with_items:
     - "{{ glusterfs_volumes }}"
+  tags:
+    - glusterfs
+    - glusterfs_volumes
+
+- name: Start the replica volumes
+  gluster_volume:
+    state: started
+    name: "{{ item.name }}"
+  with_items:
+    - "{{ glusterfs_volumes }}"
+  tags:
+    - glusterfs
+    - glusterfs_volumes

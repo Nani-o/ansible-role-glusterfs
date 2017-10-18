@@ -19,13 +19,13 @@ Compatibility
 Role Variables
 --------------
 
-- glusterfs_role_role_master
+- glusterfs_role_master
 
 A boolean that I add for security. It only mean that the host is the "main node" of a cluster and will hold all the configurations for the other hosts.
 It needs to be set to true for the role to apply.
 
 ```YAML
-glusterfs_role_role_master: true
+glusterfs_role_master: true
 ```
 
 - glusterfs_cluster_members
@@ -39,9 +39,9 @@ glusterfs_cluster_members:
   - gfs-member-3
 ```
 
-- glusterfs_volumes
+- glusterfs_replica_volumes
 
-List of hash containing the configuration for a volume. They will be created and started.
+List of hash containing the configuration for the replica volumes. It will be replicated on all the hosts of glusterfs_cluster_members + the role_master.
 
 ```YAML
 glusterfs_volumes:
