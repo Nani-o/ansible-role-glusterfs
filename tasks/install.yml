@@ -22,6 +22,8 @@
       - "{{ inventory_hostname }}"
       - "{{ glusterfs_cluster_members }}"
     delegate_to: "{{ item }}"
+    notify:
+      - restart glusterd
 
   tags:
     - glusterfs

@@ -1,0 +1,9 @@
+---
+- name: restart glusterd
+  systemd:
+    name: glusterd
+    state: restarted
+  with_items:
+    - "{{ inventory_hostname }}"
+    - "{{ glusterfs_cluster_members }}"
+  delegate_to: "{{ item }}"
