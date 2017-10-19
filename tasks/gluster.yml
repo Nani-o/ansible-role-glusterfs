@@ -18,7 +18,7 @@
     replicas: "{{ ([inventory_hostname] + glusterfs_cluster_members) | length }}"
     force: yes
   with_items:
-    - "{{ glusterfs_volumes }}"
+    - "{{ glusterfs_replica_volumes }}"
   tags:
     - glusterfs
     - glusterfs_volumes
@@ -28,7 +28,7 @@
     state: started
     name: "{{ item.name }}"
   with_items:
-    - "{{ glusterfs_volumes }}"
+    - "{{ glusterfs_replica_volumes }}"
   tags:
     - glusterfs
     - glusterfs_volumes

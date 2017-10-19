@@ -44,7 +44,7 @@ glusterfs_cluster_members:
 List of hash containing the configuration for the replica volumes. It will be replicated on all the hosts of glusterfs_cluster_members + the role_master.
 
 ```YAML
-glusterfs_volumes:
+glusterfs_replica_volumes:
   - name: vol1
     bricks: /bricks/brick1/gv1
 ```
