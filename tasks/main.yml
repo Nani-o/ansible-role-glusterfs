@@ -2,7 +2,7 @@
 - name: Executing only on CentOS 7 if glusterfs_role_master is set to true
   block:
   - include_tasks: install.yml
-  - include_tasks: replica_volumes.yml
+  - include_tasks: replica-volumes.yml
   when: 
     - ansible_distribution + ansible_distribution_major_version == "CentOS7"
     - glusterfs_role_master == true

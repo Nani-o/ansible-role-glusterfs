@@ -47,6 +47,9 @@ List of hash containing the configuration for the replica volumes. It will be re
 glusterfs_replica_volumes:
   - name: vol1
     bricks: /bricks/brick1/gv1
+    cluster:
+      - gfs1
+      - gfs2
 ```
 
 Example Playbook
