@@ -42,6 +42,7 @@ glusterfs_cluster_members:
 - glusterfs_replica_volumes
 
 List of hash containing the configuration for the replica volumes. It will be replicated on all the hosts of glusterfs_cluster_members + the role_master.
+If omited cluster is defaulted to the role master and the members of the cluster.
 
 ```YAML
 glusterfs_replica_volumes:

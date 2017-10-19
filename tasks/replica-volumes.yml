@@ -14,8 +14,8 @@
     state: present
     name: "{{ item.name }}"
     bricks: "{{ item.bricks }}"
-    cluster: "{{ item.cluster }}"
-    replicas: "{{ item.cluster | length }}"
+    cluster: "{{ item.cluster | default([inventory_hostname] | list + glusterfs_cluster_members) }}"
+    replicas: "{{ item.cluster | default([inventory_hostname] | list + glusterfs_cluster_members) | length }}"
     force: yes
   with_items:
     - "{{ glusterfs_replica_volumes }}"
