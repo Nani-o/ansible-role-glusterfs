@@ -7,7 +7,7 @@
     - "{{ glusterfs_cluster_members }}"
   tags:
     - glusterfs
-    - glusterfs_volumes
+    - glusterfs_replica_volumes
 
 - name: Create the replicas volumes
   gluster_volume:
@@ -21,7 +21,7 @@
     - "{{ glusterfs_replica_volumes }}"
   tags:
     - glusterfs
-    - glusterfs_volumes
+    - glusterfs_replica_volumes
 
 - name: Start the replica volumes
   gluster_volume:
@@ -31,4 +31,4 @@
     - "{{ glusterfs_replica_volumes }}"
   tags:
     - glusterfs
-    - glusterfs_volumes
+    - glusterfs_replica_volumes
