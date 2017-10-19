@@ -1,0 +1,71 @@
+---
+- name: Install required packages
+  yum:
+    name:
+      - openssh-clients
+      - openssh-server
+      - rsync
+      - glusterfs-geo-replication
+    state: latest
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ inventory_hostname }}"
+    - "{{ glusterfs_cluster_members }}"
+    - "{{ glusterfs_slave_members }}"
+  tags:
+    - glusterfs
+    - glusterfs_geo_replication
+
+- name: Create group for geo replication
+  group:
+    name: geogroup
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ glusterfs_slave_members }}"
+
+- name: Create account for geo replication
+  user:
+    name: geoaccount
+    group: geogroup
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ glusterfs_slave_members }}"
+
+- name: Setup mountbroker root directory
+  shell: gluster-mountbroker setup /var/mountbroker-root geogroup
+  run_once: true
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ glusterfs_slave_members }}"
+
+- name: Add a volume to the mountbroker
+  shell: gluster-mountbroker add vol1 geoaccount
+  run_once: true
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ glusterfs_slave_members }}"
+
+- name: Restart glusterd
+  systemd:
+    name: glusterd
+    state: restarted
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ glusterfs_slave_members }}"
+  
+- name: Generate ssh-key
+  shell: ssh-keygen -t rsa -N "" -f $HOME/.ssh/id_rsa
+  ignore_errors: true
+
+- name: Get pubkey
+  shell: cat $HOME/.ssh/id_rsa.pub
+  register: pubkey
+
+- name: setup de la pubkey
+  authorized_key:
+    user: geoaccount
+    key: "{{ pubkey.stdout_lines[0] }}"
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ glusterfs_slave_members }}"
+
