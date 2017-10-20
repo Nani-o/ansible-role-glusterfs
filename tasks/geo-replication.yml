@@ -41,6 +41,7 @@
 
 - name: Check mountbrokers config
   shell: gluster-mountbroker status | grep -e 'UP.*/var/mountbroker-root(OK).*geogroup(OK).*geoaccount.*vol1'
+  changed_when: false
   register: mountbrokers_status
   delegate_to: "{{ glusterfs_slave_members[0] }}"
 
@@ -66,6 +67,7 @@
 - name: Generate ssh-key
   shell: ssh-keygen -t rsa -N "" -f $HOME/.ssh/id_rsa
   register: generate_ssh_key
+  changed_when: "'already exists' not in generate_ssh_key.stdout"
   failed_when:
     - "generate_ssh_key.rc != 0"
     - "'already exists' not in generate_ssh_key.stdout"
