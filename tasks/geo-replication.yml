@@ -63,7 +63,10 @@
   
 - name: Generate ssh-key
   shell: ssh-keygen -t rsa -N "" -f $HOME/.ssh/id_rsa
-  ignore_errors: true
+  register: generate_ssh_key
+  failed_when:
+    - "generate_ssh_key.rc != 0"
+    - "'already exists' not in generate_ssh_key.stdout"
 
 - name: Get pubkey
   shell: cat $HOME/.ssh/id_rsa.pub
@@ -73,6 +76,7 @@
   authorized_key:
     user: geoaccount
     key: "{{ pubkey.stdout_lines[0] }}"
+  run_once: true
   delegate_to: "{{ item }}"
   with_items:
     - "{{ glusterfs_slave_members }}"
@@ -97,6 +101,10 @@
 
 - name: Start the session
   shell: "gluster volume geo-replication vol1 geoaccount@{{ glusterfs_slave_members[0] }}::vol1 start"
+  register: starting_session
+  failed_when:
+    - "starting_session.rc != 0"
+    - "'already started' not in starting_session.stderr"
 
 - name: Create a directory for mounting glusterfs
   file:
