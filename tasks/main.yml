@@ -3,9 +3,12 @@
   block:
   - include_tasks: install.yml
   - include_tasks: replica-volumes.yml
-  - include_tasks: geo-replication.yml
-    tags:
-      - glusters_geo_replication
   when: 
+
+- include_tasks: geo-replication.yml
+  when:
     - ansible_distribution + ansible_distribution_major_version == "CentOS7"
     - glusterfs_role_master == true
+    - glusterfs_slave_members is defined
+  tags:
+    - glusters_geo_replication
