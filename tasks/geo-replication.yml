@@ -31,6 +31,14 @@
   with_items:
     - "{{ glusterfs_slave_members }}"
 
+- name: Make sure sshd is started on the slaves
+  systemd:
+    name: sshd
+    state: started
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ glusterfs_slave_members }}"
+
 - name: Setup mountbroker root directory
   shell: gluster-mountbroker setup /var/mountbroker-root geogroup
   run_once: true
