@@ -87,6 +87,7 @@
   failed_when:
     - "geo_create_session.rc != 0"
     - "'already created' not in geo_create_session.stderr"
+    - "'is not empty' not in geo_create_session.stderr"
 
 - name: Slave autorizations for slave user
   shell: "/usr/libexec/glusterfs/set_geo_rep_pem_keys.sh geoaccount vol1 vol1"
