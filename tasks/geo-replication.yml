@@ -81,10 +81,12 @@
   shell : gluster-georep-sshkey generate
 
 - name: Push the key and create session
-  shell: "gluster volume geo-replication vol1 geoaccount@{{ item }}::vol1 create push-pem"
-  run_once: true
-  with_items:
-    - "{{ glusterfs_slave_members }}"
+  shell: "gluster volume geo-replication vol1 geoaccount@{{ glusterfs_slave_members[0] }}::vol1 create push-pem"
+  register: geo_create_session
+  changed_when: 'alread created' not in geo_create_session.stderr
+  failed_when:
+    - geo_create_session.rc != 0
+    - 'already created' not in geo_create_session.stderr
 
 - name: Slave autorizations for slave user
   shell: "/usr/libexec/glusterfs/set_geo_rep_pem_keys.sh geoaccount vol1 vol1"
@@ -93,8 +95,8 @@
   with_items:
     - "{{ glusterfs_slave_members }}"
 
-- name: Push the key and create session
-  shell: "gluster volume geo-replication vol1 geoaccount@{{ item }}::vol1 start"
+- name: Start the session
+  shell: "gluster volume geo-replication vol1 geoaccount@{{ glusterfs_slave_members[0] }}::vol1 start"
   run_once: true
   with_items:
     - "{{ glusterfs_slave_members }}"
