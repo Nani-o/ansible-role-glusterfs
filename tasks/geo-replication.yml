@@ -112,7 +112,7 @@
 - name: Create file
   file:
     path: /mnt/glusterfs/test
-    state: present
+    state: touch
 
 - name: Checking file on all nodes
   shell: "stat /data/gv1/test"
