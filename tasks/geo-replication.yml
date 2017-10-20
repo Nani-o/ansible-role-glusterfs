@@ -39,24 +39,26 @@
   with_items:
     - "{{ glusterfs_slave_members }}"
 
+- name: Check mountbrokers config
+  shell: gluster-mountbroker status | grep -e 'UP.*/var/mountbroker-root(OK).*geogroup(OK).*geoaccount.*vol1'
+  register: mountbrokers_status
+  delegate_to: "{{ glusterfs_slave_members[0] }}"
+
 - name: Setup mountbroker root directory
   shell: gluster-mountbroker setup /var/mountbroker-root geogroup
-  run_once: true
-  delegate_to: "{{ item }}"
-  with_items:
-    - "{{ glusterfs_slave_members }}"
+  when: "mountbrokers_status.stdout_lines | length != glusterfs_slave_members | length"
+  delegate_to: "{{ glusterfs_slave_members[0] }}"
 
 - name: Add a volume to the mountbroker
   shell: gluster-mountbroker add vol1 geoaccount
-  run_once: true
-  delegate_to: "{{ item }}"
-  with_items:
-    - "{{ glusterfs_slave_members }}"
+  when: "mountbrokers_status.stdout_lines | length != glusterfs_slave_members | length"
+  delegate_to: "{{ glusterfs_slave_members[0] }}"
 
 - name: Restart glusterd
   systemd:
     name: glusterd
     state: restarted
+  when: "mountbrokers_status.stdout_lines | length != glusterfs_slave_members | length"
   delegate_to: "{{ item }}"
   with_items:
     - "{{ glusterfs_slave_members }}"
@@ -71,6 +73,7 @@
 - name: Get pubkey
   shell: cat $HOME/.ssh/id_rsa.pub
   register: pubkey
+  changed_when: false
 
 - name: setup de la pubkey
   authorized_key:
@@ -83,6 +86,7 @@
 
 - name: Generate the key on the masters
   shell : gluster-georep-sshkey generate
+  changed_when: false
 
 - name: Push the key and create session
   shell: "gluster volume geo-replication vol1 geoaccount@{{ glusterfs_slave_members[0] }}::vol1 create push-pem"
