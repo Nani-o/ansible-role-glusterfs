@@ -41,6 +41,7 @@
 
 - name: Check mountbrokers config
   shell: gluster-mountbroker status | grep -e 'UP.*/var/mountbroker-root(OK).*geogroup(OK).*geoaccount.*vol1'
+  ignore_errors: true
   changed_when: false
   register: mountbrokers_status
   delegate_to: "{{ glusterfs_slave_members[0] }}"
