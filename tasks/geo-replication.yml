@@ -90,16 +90,12 @@
 
 - name: Slave autorizations for slave user
   shell: "/usr/libexec/glusterfs/set_geo_rep_pem_keys.sh geoaccount vol1 vol1"
-  run_once: true
   delegate_to: "{{ item }}"
   with_items:
-    - "{{ glusterfs_slave_members }}"
+    - "{{ glusterfs_slave_members[0] }}"
 
 - name: Start the session
   shell: "gluster volume geo-replication vol1 geoaccount@{{ glusterfs_slave_members[0] }}::vol1 start"
-  run_once: true
-  with_items:
-    - "{{ glusterfs_slave_members }}"
 
 - name: Create a directory for mounting glusterfs
   file:
