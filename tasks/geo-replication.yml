@@ -126,16 +126,3 @@
     fstype: glusterfs
     state: mounted  
 
-- name: Create file
-  file:
-    path: /mnt/glusterfs/test
-    state: touch
-
-- name: Checking file on all nodes
-  shell: "stat /data/gv1/test"
-  delegate_to: "{{ item }}"
-  with_items:
-    - "{{ inventory_hostname }}"
-    - "{{ glusterfs_cluster_members }}"
-    - "{{ glusterfs_slave_members }}"
-
