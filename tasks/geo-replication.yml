@@ -69,3 +69,50 @@
   with_items:
     - "{{ glusterfs_slave_members }}"
 
+- name: Generate the key on the masters
+  shell : gluster-georep-sshkey generate
+
+- name: Push the key and create session
+  shell: "gluster volume geo-replication vol1 geoaccount@{{ item }}::vol1 create push-pem"
+  run_once: true
+  with_items:
+    - "{{ glusterfs_slave_members }}"
+
+- name: Slave autorizations for slave user
+  shell: "/usr/libexec/glusterfs/set_geo_rep_pem_keys.sh geoaccount vol1 vol1"
+  run_once: true
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ glusterfs_slave_members }}"
+
+- name: Push the key and create session
+  shell: "gluster volume geo-replication vol1 geoaccount@{{ item }}::vol1 start"
+  run_once: true
+  with_items:
+    - "{{ glusterfs_slave_members }}"
+
+- name: Create a directory for mounting glusterfs
+  file:
+    path: /mnt/glusterfs
+    state: directory
+
+- name: Mount the vol1 from master cluster
+  mount:
+    path: /mnt/glusterfs
+    src: gfs1:/vol1
+    fstype: glusterfs
+    state: mounted  
+
+- name: Create file
+  file:
+    path: /mnt/glusterfs/test
+    state: present
+
+- name: Checking file on all nodes
+  shell: "stat /data/gv1/test"
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ inventory_hostname }}"
+    - "{{ glusterfs_cluster_members }}"
+    - "{{ glusterfs_slave_members }}"
+
