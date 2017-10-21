@@ -13,14 +13,14 @@
     - "{{ glusterfs_cluster_members }}"
     - "{{ glusterfs_slave_members }}"
 
-- name: Create group for geo replication
+- name: Create the group {{ glusterfs_georeplication_group }} for the geo-replication
   group:
     name: "{{ glusterfs_georeplication_group }}"
   delegate_to: "{{ item }}"
   with_items:
     - "{{ glusterfs_slave_members }}"
 
-- name: Create account for geo replication
+- name: Create user {{ glusterfs_georeplication_user }} for the geo-replication
   user:
     name: "{{ glusterfs_georeplication_user }}"
     group: "{{ glusterfs_georeplication_group }}"
@@ -63,7 +63,7 @@
 - name: Flush handlers
   meta: flush_handlers
 
-- name: Generate ssh-key
+- name: Generate ssh-key for accessing the slaves with the {{ glusterfs_georeplication_user }} user
   shell: ssh-keygen -t rsa -N "" -f $HOME/.ssh/id_rsa
   register: generate_ssh_key
   changed_when: "'already exists' not in generate_ssh_key.stdout"
@@ -71,12 +71,12 @@
     - "generate_ssh_key.rc != 0"
     - "'already exists' not in generate_ssh_key.stdout"
 
-- name: Get pubkey
+- name: Retrieving the pubkey
   shell: cat $HOME/.ssh/id_rsa.pub
   register: pubkey
   changed_when: false
 
-- name: setup de la pubkey
+- name: Setting up the key on one slave for the {{ glusterfs_georeplication_user }} user
   authorized_key:
     user: geoaccount
     key: "{{ pubkey.stdout_lines[0] }}"
@@ -85,11 +85,11 @@
   with_items:
     - "{{ glusterfs_slave_members }}"
 
-- name: Generate the key on the masters
+- name: Generate the pem restricted keys on the masters
   shell : gluster-georep-sshkey generate
   changed_when: false
 
-- name: Push the key and create session
+- name: Push the key and create session for each geo-replicated volumes
   shell: "gluster volume geo-replication {{ item.master_volume }} geoaccount@{{ glusterfs_slave_members[0] }}::{{ item.slave_volume }} create push-pem"
   register: geo_create_session
   with_items: "{{ glusterfs_georeplication_volumes }}"
@@ -101,13 +101,13 @@
     - "'already created' not in geo_create_session.stderr"
     - "'is not empty' not in geo_create_session.stderr"
 
-- name: Slave autorizations for slave user
+- name: Spreading the pem keys on all slaves
   shell: "/usr/libexec/glusterfs/set_geo_rep_pem_keys.sh geoaccount {{ item.master_volume }} {{ item.slave_volume }}"
   with_items: "{{ glusterfs_georeplication_volumes }}"
   changed_when: false
   delegate_to: "{{ glusterfs_slave_members[0] }}"
 
-- name: Start the session
+- name: Start each geo-replicated sessions
   shell: "gluster volume geo-replication {{ item.master_volume }} geoaccount@{{ glusterfs_slave_members[0] }}::{{ item.slave_volume }} start"
   with_items: "{{ glusterfs_georeplication_volumes }}"
   changed_when: "'already started' not in starting_session.stderr"
