@@ -12,9 +12,6 @@
     - "{{ inventory_hostname }}"
     - "{{ glusterfs_cluster_members }}"
     - "{{ glusterfs_slave_members }}"
-  tags:
-    - glusterfs
-    - glusterfs_geo_replication
 
 - name: Create group for geo replication
   group:
@@ -52,20 +49,20 @@
   when: "item.stdout_lines | length != glusterfs_slave_members | length"
   with_items: "{{ mountbrokers_status.results }}"
   delegate_to: "{{ glusterfs_slave_members[0] }}"
+  notify:
+    - restart glusterd slaves
 
 - name: Add a volume to the mountbroker
   shell: gluster-mountbroker add vol1 geoaccount
   when: "item.stdout_lines | length != glusterfs_slave_members | length"
   with_items: "{{ mountbrokers_status.results }}"
   delegate_to: "{{ glusterfs_slave_members[0] }}"
+  notify:
+    - restart glusterd slaves
 
-- name: Restart glusterd
-  systemd:
-    name: glusterd
-    state: restarted
-  with_items:
-    - "{{ glusterfs_slave_members }}"
-  
+- name: Flush handlers
+  meta: flush_handlers
+
 - name: Generate ssh-key
   shell: ssh-keygen -t rsa -N "" -f $HOME/.ssh/id_rsa
   register: generate_ssh_key
@@ -95,7 +92,7 @@
 - name: Push the key and create session
   shell: "gluster volume geo-replication vol1 geoaccount@{{ glusterfs_slave_members[0] }}::vol1 create push-pem"
   register: geo_create_session
-  changed_when: 
+  changed_when:
     - "'alread created' not in geo_create_session.stderr"
     - "'is not empty' not in geo_create_session.stderr"
   failed_when:
@@ -128,5 +125,4 @@
     path: /mnt/glusterfs
     src: gfs1:/vol1
     fstype: glusterfs
-    state: mounted  
-
+    state: mounted
