@@ -115,15 +115,3 @@
   failed_when:
     - "starting_session.rc != 0"
     - "'already started' not in starting_session.stderr"
-
-- name: Create a directory for mounting glusterfs
-  file:
-    path: /mnt/glusterfs
-    state: directory
-
-- name: Mount the vol1 from master cluster
-  mount:
-    path: /mnt/glusterfs
-    src: gfs1:/vol1
-    fstype: glusterfs
-    state: mounted
