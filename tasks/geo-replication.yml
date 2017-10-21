@@ -53,7 +53,7 @@
     - restart glusterd slaves
 
 - name: Add a volume to the mountbroker
-  shell: gluster-mountbroker add vol1 geoaccount
+  shell: gluster-mountbroker add {{ item.item.slave_volume }} {{ glusterfs_georeplication_user }}
   when: "item.stdout_lines | length != glusterfs_slave_members | length"
   with_items: "{{ mountbrokers_status.results }}"
   delegate_to: "{{ glusterfs_slave_members[0] }}"
@@ -105,9 +105,7 @@
   shell: "/usr/libexec/glusterfs/set_geo_rep_pem_keys.sh geoaccount {{ item.master_volume }} {{ item.slave_volume }}"
   with_items: "{{ glusterfs_georeplication_volumes }}"
   changed_when: false
-  delegate_to: "{{ item }}"
-  with_items:
-    - "{{ glusterfs_slave_members[0] }}"
+  delegate_to: "{{ glusterfs_slave_members[0] }}"
 
 - name: Start the session
   shell: "gluster volume geo-replication {{ item.master_volume }} geoaccount@{{ glusterfs_slave_members[0] }}::{{ item.slave_volume }} start"
