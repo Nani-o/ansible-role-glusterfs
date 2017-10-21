@@ -90,8 +90,9 @@
   changed_when: false
 
 - name: Push the key and create session
-  shell: "gluster volume geo-replication vol1 geoaccount@{{ glusterfs_slave_members[0] }}::vol1 create push-pem"
+  shell: "gluster volume geo-replication {{ item.master_volume }} geoaccount@{{ glusterfs_slave_members[0] }}::{{ item.slave_volume }} create push-pem"
   register: geo_create_session
+  with_items: "{{ glusterfs_georeplication_volumes }}"
   changed_when:
     - "'alread created' not in geo_create_session.stderr"
     - "'is not empty' not in geo_create_session.stderr"
@@ -101,14 +102,16 @@
     - "'is not empty' not in geo_create_session.stderr"
 
 - name: Slave autorizations for slave user
-  shell: "/usr/libexec/glusterfs/set_geo_rep_pem_keys.sh geoaccount vol1 vol1"
+  shell: "/usr/libexec/glusterfs/set_geo_rep_pem_keys.sh geoaccount {{ item.master_volume }} {{ item.slave_volume }}"
+  with_items: "{{ glusterfs_georeplication_volumes }}"
   changed_when: false
   delegate_to: "{{ item }}"
   with_items:
     - "{{ glusterfs_slave_members[0] }}"
 
 - name: Start the session
-  shell: "gluster volume geo-replication vol1 geoaccount@{{ glusterfs_slave_members[0] }}::vol1 start"
+  shell: "gluster volume geo-replication {{ item.master_volume }} geoaccount@{{ glusterfs_slave_members[0] }}::{{ item.slave_volume }} start"
+  with_items: "{{ glusterfs_georeplication_volumes }}"
   changed_when: "'already started' not in starting_session.stderr"
   register: starting_session
   failed_when:
