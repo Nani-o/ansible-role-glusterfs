@@ -1,0 +1,4 @@
+---
+glusterfs_georeplication_user: "geoaccount"
+glusterfs_georeplication_group: "geogroup"
+glusterfs_georeplication_mountbroker_path: "/var/mountbroker-root"

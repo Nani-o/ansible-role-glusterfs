@@ -11,4 +11,4 @@
     - glusterfs_role_master == true
     - glusterfs_slave_members is defined
   tags:
-    - glusters_geo_replication
+    - glusterfs_georeplication

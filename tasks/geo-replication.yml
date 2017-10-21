@@ -18,15 +18,15 @@
 
 - name: Create group for geo replication
   group:
-    name: geogroup
+    name: "{{ glusterfs_georeplication_group }}"
   delegate_to: "{{ item }}"
   with_items:
     - "{{ glusterfs_slave_members }}"
 
 - name: Create account for geo replication
   user:
-    name: geoaccount
-    group: geogroup
+    name: "{{ glusterfs_georeplication_user }}"
+    group: "{{ glusterfs_georeplication_group }}"
   delegate_to: "{{ item }}"
   with_items:
     - "{{ glusterfs_slave_members }}"
@@ -40,28 +40,29 @@
     - "{{ glusterfs_slave_members }}"
 
 - name: Check mountbrokers config
-  shell: gluster-mountbroker status | grep -e 'UP.*/var/mountbroker-root(OK).*geogroup(OK).*geoaccount.*vol1'
+  shell: gluster-mountbroker status | grep -e 'UP.*{{ glusterfs_georeplication_mountbroker_path }}(OK).*{{ glusterfs_georeplication_group }}(OK).*{{ glusterfs_georeplication_user }}.*{{ item.slave_volume }}'
   ignore_errors: true
   changed_when: false
+  with_items: "{{ glusterfs_georeplication_volumes }}"
   register: mountbrokers_status
   delegate_to: "{{ glusterfs_slave_members[0] }}"
 
 - name: Setup mountbroker root directory
-  shell: gluster-mountbroker setup /var/mountbroker-root geogroup
-  when: "mountbrokers_status.stdout_lines | length != glusterfs_slave_members | length"
+  shell: "gluster-mountbroker setup {{ glusterfs_georeplication_mountbroker_path }} {{ glusterfs_georeplication_group }}"
+  when: "item.stdout_lines | length != glusterfs_slave_members | length"
+  with_items: "{{ mountbrokers_status.results }}"
   delegate_to: "{{ glusterfs_slave_members[0] }}"
 
 - name: Add a volume to the mountbroker
   shell: gluster-mountbroker add vol1 geoaccount
-  when: "mountbrokers_status.stdout_lines | length != glusterfs_slave_members | length"
+  when: "item.stdout_lines | length != glusterfs_slave_members | length"
+  with_items: "{{ mountbrokers_status.results }}"
   delegate_to: "{{ glusterfs_slave_members[0] }}"
 
 - name: Restart glusterd
   systemd:
     name: glusterd
     state: restarted
-  when: "mountbrokers_status.stdout_lines | length != glusterfs_slave_members | length"
-  delegate_to: "{{ item }}"
   with_items:
     - "{{ glusterfs_slave_members }}"
   

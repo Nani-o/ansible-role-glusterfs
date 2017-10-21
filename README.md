@@ -53,6 +53,42 @@ glusterfs_replica_volumes:
       - gfs2
 ```
 
+- glusterfs_georeplication_volumes
+
+List of configurations for the georeplications volumes.
+
+```YAML
+glusterfs_georeplication_volumes:
+  - master_volume: vol1
+    slave_volume: vol1
+  - master_volume: vol2
+    slave_volume: vol2
+```
+
+- glusterfs_georeplication_user
+
+User to use for the georeplication, defaulted to geoaccount.    
+
+```YAML
+glusterfs_georeplication_user: replication_user
+```
+
+- glusterfs_georeplication_group
+
+Group to use for the georeplication, defaulted to geogroup.
+
+```YAML
+glusterfs_georeplication_group: replication_group
+```
+
+- glusterfs_georeplication_mountbroker_path
+
+Path to use for the mountbroker on the slaves, defaulted to /var/mountbroker-root.
+
+```YAML
+glusterfs_georeplication_mountbroker_path: /data/mountbroker/
+```
+
 Example Playbook
 ----------------
 
