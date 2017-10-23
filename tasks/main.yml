@@ -4,11 +4,25 @@
   - include_tasks: install.yml
   - include_tasks: replica-volumes.yml
   when: 
+    - ansible_distribution + ansible_distribution_major_version == "CentOS7"
+    - glusterfs_role_master is defined and glusterfs_role_master == true
+  tags:
+    - glusterfs_install
+    - glusterfs_volumes
 
 - include_tasks: geo-replication.yml
   when:
     - ansible_distribution + ansible_distribution_major_version == "CentOS7"
-    - glusterfs_role_master == true
+    - glusterfs_role_master is defined and glusterfs_role_master == true
     - glusterfs_slave_members is defined
   tags:
     - glusterfs_georeplication
+
+- include_tasks: ctdb.yml
+  when:
+    - ansible_distribution + ansible_distribution_major_version == "CentOS7"
+    - glusterfs_role_master is defined and glusterfs_role_master == true
+    - glusterfs_ctdb_install is defined and glusterfs_ctdb_install == true
+  tags:
+    - glusterfs_ctdb
+

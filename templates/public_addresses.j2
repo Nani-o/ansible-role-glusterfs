@@ -1,0 +1,3 @@
+{% for public_address in glusterfs_ctdb_public_addresses %}
+{{ public_address.ip }} {{ public_address.nic }}
+{% endfor %}

@@ -1,0 +1,79 @@
+---
+- name: Install required packages
+  yum:
+    name:
+      - ctdb
+      - samba
+    state: latest
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ inventory_hostname }}"
+    - "{{ glusterfs_cluster_members }}"
+
+- name: Make sure lock folder is present
+  file:
+    path: /gluster/lock
+    recurse: yes
+    state: directory
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ inventory_hostname }}"
+    - "{{ glusterfs_cluster_members }}"
+
+- name: Mount ctdb volume
+  mount:
+    src: "{{ item }}:/{{ glusterfs_ctdb_config_volume }}"
+    path: /gluster/lock
+    fstype: glusterfs
+    state: mounted
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ inventory_hostname }}"
+    - "{{ glusterfs_cluster_members }}"
+
+- name: Copy ctdb config file
+  copy:
+    src: ctdb
+    dest: /gluster/lock
+
+- name: Copy templates files
+  template:
+    src: "{{ item }}.j2"
+    dest: "/gluster/lock/{{ item }}"
+  with_items:
+    - public_addresses
+    - nodes
+
+- name: Create symlinks
+  file:
+    src: "/gluster/lock/ctdb"
+    dest: "/etc/sysconfig/ctdb"
+    force: yes
+    state: link
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ inventory_hostname }}"
+    - "{{ glusterfs_cluster_members }}"
+
+- name: Create symlinks
+  file:
+    src: "/gluster/lock/public_addresses"
+    dest: "/etc/ctdb/public_addresses"
+    force: yes
+    state: link
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ inventory_hostname }}"
+    - "{{ glusterfs_cluster_members }}"
+
+- name: Create symlinks
+  file:
+    src: "/gluster/lock/nodes"
+    dest: "/etc/ctdb/nodes"
+    force: yes
+    state: link
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ inventory_hostname }}"
+    - "{{ glusterfs_cluster_members }}"
+

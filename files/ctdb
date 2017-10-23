@@ -1,0 +1,5 @@
+CTDB_RECOVERY_LOCK=/gluster/lock/lockfile
+CTDB_PUBLIC_ADDRESSES=/etc/ctdb/public_addresses
+CTDB_MANAGES_SAMBA=yes
+CTDB_SAMBA_SKIP_SHARE_CHECK=yes
+CTDB_NODES=/etc/ctdb/nodes
