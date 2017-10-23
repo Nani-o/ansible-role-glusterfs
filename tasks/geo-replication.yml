@@ -17,6 +17,7 @@
   group:
     name: "{{ glusterfs_georeplication_group }}"
   delegate_to: "{{ item }}"
+  when: "glusterfs_manage_users"
   with_items:
     - "{{ glusterfs_slave_members }}"
 
@@ -25,6 +26,7 @@
     name: "{{ glusterfs_georeplication_user }}"
     group: "{{ glusterfs_georeplication_group }}"
   delegate_to: "{{ item }}"
+  when: "glusterfs_manage_users"
   with_items:
     - "{{ glusterfs_slave_members }}"
 
