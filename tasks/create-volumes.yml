@@ -1,14 +1,4 @@
 ---
-- name: Join cluster members
-  shell: "gluster peer probe {{ item }}"
-  register: gluster_peering
-  changed_when: "'already in peer list' not in gluster_peering.stdout"
-  with_items:
-    - "{{ glusterfs_cluster_members }}"
-  tags:
-    - glusterfs
-    - glusterfs_replica_volumes
-
 - name: Create the replicas volumes
   gluster_volume:
     state: present
@@ -17,18 +7,25 @@
     cluster: "{{ item.cluster | default([inventory_hostname] | list + glusterfs_cluster_members) }}"
     replicas: "{{ item.cluster | default([inventory_hostname] | list + glusterfs_cluster_members) | length }}"
     force: yes
+  when: "glusterfs_replica_volumes is defined"
   with_items:
     - "{{ glusterfs_replica_volumes }}"
-  tags:
-    - glusterfs
-    - glusterfs_replica_volumes
+
+- name: Create the distributed volumes
+  gluster_volume:
+    state: present
+    name: "{{ item.name }}"
+    bricks: "{{ item.bricks }}"
+    cluster: "{{ item.cluster | default([inventory_hostname] | list + glusterfs_cluster_members) }}"
+    force: yes
+  when: "glusterfs_distributed_volumes is defined"
+  with_items:
+    - "{{ glusterfs_distributed_volumes }}"
 
 - name: Start the replica volumes
   gluster_volume:
     state: started
     name: "{{ item.name }}"
   with_items:
-    - "{{ glusterfs_replica_volumes }}"
-  tags:
-    - glusterfs
-    - glusterfs_replica_volumes
+    - "{{ glusterfs_replica_volumes | default([]) }}"
+    - "{{ glusterfs_distributed_volumes | default([]) }}"

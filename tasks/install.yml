@@ -1,33 +1,33 @@
 ---
-- name: Installation of glusterfs on the main nodes and cluster members
-  block:
+- name: Install the repository
+  yum:
+    name: centos-release-gluster312
+  with_items:
+    - "{{ inventory_hostname }}"
+    - "{{ glusterfs_cluster_members }}"
+  delegate_to: "{{ item }}"
 
-  - name: Install the repository
-    yum:
-      name: centos-release-gluster312
-    with_items:
-      - "{{ inventory_hostname }}"
-      - "{{ glusterfs_cluster_members }}"
-    delegate_to: "{{ item }}"
+- name: Install the packages
+  yum:
+    name:
+      - glusterfs
+      - glusterfs-cli
+      - glusterfs-libs
+      - glusterfs-server
+    state: latest
+  with_items:
+    - "{{ inventory_hostname }}"
+    - "{{ glusterfs_cluster_members }}"
+  delegate_to: "{{ item }}"
+  notify:
+    - restart glusterd
 
-  - name: Install the packages
-    yum:
-      name:
-        - glusterfs
-        - glusterfs-cli
-        - glusterfs-libs
-        - glusterfs-server
-      state: latest
-    with_items:
-      - "{{ inventory_hostname }}"
-      - "{{ glusterfs_cluster_members }}"
-    delegate_to: "{{ item }}"
-    notify:
-      - restart glusterd
+- name: Flush handlers
+  meta: flush_handlers
 
-  - name: Flush handlers
-    meta: flush_handlers
-
-  tags:
-    - glusterfs
-    - glusterfs_install
+- name: Join cluster members
+  shell: "gluster peer probe {{ item }}"
+  register: gluster_peering
+  changed_when: "'already in peer list' not in gluster_peering.stdout"
+  with_items:
+    - "{{ glusterfs_cluster_members }}"

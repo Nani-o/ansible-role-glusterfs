@@ -1,13 +1,19 @@
 ---
-- name: Executing only on CentOS 7 if glusterfs_role_master is set to true
-  block:
-  - include_tasks: install.yml
-  - include_tasks: replica-volumes.yml
+- include_tasks: install.yml
   when: 
     - ansible_distribution + ansible_distribution_major_version == "CentOS7"
     - glusterfs_role_master is defined and glusterfs_role_master == true
   tags:
+    - glusterfs
     - glusterfs_install
+
+- include_tasks: create-volumes.yml
+  when: 
+    - ansible_distribution + ansible_distribution_major_version == "CentOS7"
+    - glusterfs_role_master is defined and glusterfs_role_master == true
+    - glusterfs_replica_volumes is defined or glusterfs_distributed_volumes is defined
+  tags:
+    - glusterfs
     - glusterfs_volumes
 
 - include_tasks: geo-replication.yml
@@ -16,6 +22,7 @@
     - glusterfs_role_master is defined and glusterfs_role_master == true
     - glusterfs_slave_members is defined
   tags:
+    - glusterfs
     - glusterfs_georeplication
 
 - include_tasks: ctdb.yml
@@ -24,5 +31,6 @@
     - glusterfs_role_master is defined and glusterfs_role_master == true
     - glusterfs_ctdb_install is defined and glusterfs_ctdb_install == true
   tags:
+    - glusterfs
     - glusterfs_ctdb
 

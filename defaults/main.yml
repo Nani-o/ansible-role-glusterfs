@@ -3,3 +3,5 @@ glusterfs_georeplication_user: geoaccount
 glusterfs_georeplication_group: geogroup
 glusterfs_georeplication_mountbroker_path: /var/mountbroker-root
 glusterfs_ctdb_samba_shares_config_path: /etc/samba/shares.conf
+glusterfs_manage_repository: yes
+glusterfs_manage_users: yes

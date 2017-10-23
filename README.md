@@ -53,6 +53,22 @@ glusterfs_replica_volumes:
       - gfs2
 ```
 
+- glusterfs_distributed_volumes
+
+List of hash containing the configuration for the distributed volumes. It will be replicated on all the hosts of glusterfs_cluster_members + the role_master.
+If omited cluster is defaulted to the role master and the members of the cluster.
+
+```YAML
+glusterfs_distributed_volumes:
+  - name: vol1
+    bricks: /bricks/brick1/gv1
+    cluster:
+      - gfs1
+      - gfs2
+  - name: vol2
+    bricks: /bricks/brick2/gv2
+```
+
 - glusterfs_georeplication_volumes
 
 List of configurations for the georeplications volumes.
@@ -168,6 +184,24 @@ The path where the shares configuration will be deployed, in order to be include
 
 ```YAML
 glusterfs_ctdb_samba_shares_config_path: /path/to/store/shares.conf
+```
+
+- glusterfs_manage_repository
+
+If you are in an environnment where packages are managed by an another role or tool, you can set this to 'no', the role will not add the official public mirror.
+You will have to configure a repository before running this role.
+
+```YAML
+glusterfs_manage_repository: no
+```
+
+- glusterfs_manage_users
+
+If you are in an environement where users are managed by an another role or tool, you can set this to 'no', the role will not try to create the replication user.
+It will only generate the key on the master and push it to the first slave, you will have to create the user and allow it to ssh before running this role.
+
+```YAML
+glusterfs_manage_users: no
 ```
 
 
