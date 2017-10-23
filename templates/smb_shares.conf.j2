@@ -1,0 +1,9 @@
+{% for share in glusterfs_ctdb_shares %}
+[{{ share.name }}]
+  comment = {{ share.comment | default('Created by Ansible.') }}
+  path = /gluster/shares/{{ share.name }}
+  valid users = {{ share.valid_users | join(' ') }}
+  force user = {{ share.force_user | default('nobody') }}
+  force group = {{ share.force_group | default('nobody') }}
+
+{% endfor %}

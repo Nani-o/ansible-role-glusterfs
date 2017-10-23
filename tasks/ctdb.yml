@@ -77,3 +77,43 @@
     - "{{ inventory_hostname }}"
     - "{{ glusterfs_cluster_members }}"
 
+- name: Make sure shares folder is present
+  file:
+    path: /gluster/shares
+    recurse: yes
+    state: directory
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ inventory_hostname }}"
+    - "{{ glusterfs_cluster_members }}"
+
+- name: Mount glusterfs volume that will host shares
+  mount:
+    src: "{{ item }}:/{{ glusterfs_ctdb_shares_volume }}"
+    path: /gluster/shares
+    fstype: glusterfs
+    state: mounted
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ inventory_hostname }}"
+    - "{{ glusterfs_cluster_members }}"
+
+- name: Create shares folders
+  file:
+    path: "/gluster/shares/{{ item.name }}"
+    state: directory
+    recurse: yes
+    owner: "{{ item.force_user | default('nobody') }}"
+    group: "{{ item.force_group | default('nobody') }}"
+  with_items:
+    - "{{ glusterfs_ctdb_shares }}"
+
+- name: Deploy shares configuration
+  template:
+    src: smb_shares.conf.j2
+    dest: "{{ glusterfs_ctdb_samba_shares_config_path }}"
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ inventory_hostname }}"
+    - "{{ glusterfs_cluster_members }}"
+

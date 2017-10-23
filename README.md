@@ -89,6 +89,80 @@ Path to use for the mountbroker on the slaves, defaulted to /var/mountbroker-roo
 glusterfs_georeplication_mountbroker_path: /data/mountbroker/
 ```
 
+- glusterfs_ctdb_install
+
+A boolean added by security, need to be set to true for ctdb configuration to happen.
+
+```YAML
+glusterfs_ctdb_install: true
+```
+
+- glusterfs_ctdb_config_volume
+
+The name of the glusterfs volume to use for storing ctdb configurations.
+
+```YAML
+glusterfs_ctdb_config_volume: volume_ctdb
+```
+
+- glusterfs_ctdb_nodes
+
+A list of IPs of the nodes used in the ctdb configuration. This will build the /etc/ctdb/nodes files.
+
+```YAML
+glusterfs_ctdb_nodes:
+  - 192.168.1.10
+  - 192.168.1.11
+```
+
+- glusterfs_ctdb_public_addresses
+
+A list of hash of the IPs and nic used in the ctdb configuration. This will build the /etc/ctdb/public_addresses files.
+
+```YAML
+glusterfs_ctdb_public_addresses:
+  - ip: 192.168.1.20/24
+    nic: eth0
+  - ip: 192.168.1.21/24
+    nic: eth0
+```
+
+- glusterfs_ctdb_shares_volume
+
+The name of the glusterfs volume to use for hosting the ctdb shares. It will be mount in /gluster/shares folder.
+
+```YAML
+glusterfs_ctdb_shares_volume: volume_shares
+```
+
+- glusterfs_ctdb_shares:
+
+A list of hash containing the cifs shares information. Only name and valid_users are required, force_user and force_group are defaulted to nobody.
+The shares will be hosted in /gluster/shares/SHARE_NAME.
+
+```YAML
+glusterfs_ctdb_shares:
+  - name: share1
+    valid_users:
+      - DOMAIN/user
+      - @DOMAIN/group
+    force_user: nobody
+    force_group: nobody
+  - name: share2
+    valid_users:
+      - sjobs
+      - bgates
+```
+
+- glusterfs_ctdb_samba_shares_config_path
+
+The path where the shares configuration will be deployed, in order to be included inside the smb.conf. Defaulted to /etc/samba/shares.conf.
+
+```YAML
+glusterfs_ctdb_samba_shares_config_path: /path/to/store/shares.conf
+```
+
+
 Example Playbook
 ----------------
 
