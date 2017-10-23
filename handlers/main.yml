@@ -17,3 +17,14 @@
   with_items:
     - "{{ glusterfs_slave_members }}"
   delegate_to: "{{ item }}"
+
+- name: restart ctdb
+  systemd:
+    name: ctdb
+    enabled: yes
+    state: restarted
+  with_items:
+    - "{{ inventory_hostname }}"
+    - "{{ glusterfs_cluster_members }}"
+  delegate_to: "{{ item }}"
+

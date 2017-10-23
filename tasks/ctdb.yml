@@ -9,6 +9,8 @@
   with_items:
     - "{{ inventory_hostname }}"
     - "{{ glusterfs_cluster_members }}"
+  notify:
+    - restart ctdb
 
 - name: Make sure lock folder is present
   file:
@@ -19,6 +21,8 @@
   with_items:
     - "{{ inventory_hostname }}"
     - "{{ glusterfs_cluster_members }}"
+  notify:
+    - restart ctdb
 
 - name: Mount ctdb volume
   mount:
@@ -30,11 +34,15 @@
   with_items:
     - "{{ inventory_hostname }}"
     - "{{ glusterfs_cluster_members }}"
+  notify:
+    - restart ctdb
 
 - name: Copy ctdb config file
   copy:
     src: ctdb
     dest: /gluster/lock
+  notify:
+    - restart ctdb
 
 - name: Copy templates files
   template:
@@ -43,6 +51,8 @@
   with_items:
     - public_addresses
     - nodes
+  notify:
+    - restart ctdb
 
 - name: Create symlinks
   file:
@@ -54,6 +64,8 @@
   with_items:
     - "{{ inventory_hostname }}"
     - "{{ glusterfs_cluster_members }}"
+  notify:
+    - restart ctdb
 
 - name: Create symlinks
   file:
@@ -65,6 +77,8 @@
   with_items:
     - "{{ inventory_hostname }}"
     - "{{ glusterfs_cluster_members }}"
+  notify:
+    - restart ctdb
 
 - name: Create symlinks
   file:
@@ -76,6 +90,8 @@
   with_items:
     - "{{ inventory_hostname }}"
     - "{{ glusterfs_cluster_members }}"
+  notify:
+    - restart ctdb
 
 - name: Make sure shares folder is present
   file:
@@ -86,6 +102,8 @@
   with_items:
     - "{{ inventory_hostname }}"
     - "{{ glusterfs_cluster_members }}"
+  notify:
+    - restart ctdb
 
 - name: Mount glusterfs volume that will host shares
   mount:
@@ -97,6 +115,8 @@
   with_items:
     - "{{ inventory_hostname }}"
     - "{{ glusterfs_cluster_members }}"
+  notify:
+    - restart ctdb
 
 - name: Create shares folders
   file:
@@ -107,6 +127,8 @@
     group: "{{ item.force_group | default('nobody') }}"
   with_items:
     - "{{ glusterfs_ctdb_shares }}"
+  notify:
+    - restart ctdb
 
 - name: Deploy shares configuration
   template:
@@ -116,4 +138,5 @@
   with_items:
     - "{{ inventory_hostname }}"
     - "{{ glusterfs_cluster_members }}"
-
+  notify:
+    - restart ctdb
