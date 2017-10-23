@@ -137,7 +137,14 @@ glusterfs_ctdb_shares_volume: volume_shares
 
 - glusterfs_ctdb_shares:
 
-A list of hash containing the cifs shares information. Only name and valid_users are required, force_user and force_group are defaulted to nobody.
+A list of hash containing the cifs shares information. Only name and valid_users are required, defaults values are :
+
+```YAML
+force_user: nobody
+force_group: nobody
+writable: yes
+comment: "Created by Ansible."
+```
 The shares will be hosted in /gluster/shares/SHARE_NAME.
 
 ```YAML
@@ -146,6 +153,7 @@ glusterfs_ctdb_shares:
     valid_users:
       - DOMAIN/user
       - @DOMAIN/group
+    writable: no
     force_user: nobody
     force_group: nobody
   - name: share2

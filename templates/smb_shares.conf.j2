@@ -3,6 +3,7 @@
   comment = {{ share.comment | default('Created by Ansible.') }}
   path = /gluster/shares/{{ share.name }}
   valid users = {{ share.valid_users | join(' ') }}
+  writable = {{ share.writable | default('yes') }}
   force user = {{ share.force_user | default('nobody') }}
   force group = {{ share.force_group | default('nobody') }}
 
