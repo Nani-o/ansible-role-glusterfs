@@ -7,6 +7,8 @@ His main purposes are :
   - Installing glusterfs.
   - Join peers to the role master.
   - Create glusterfs volumes.
+  - Setting up geo replication with another cluster
+  - Setting up high availabilty cifs through ctdb
 
 For simplicity, this role is only executed on the "main node" that will delegate all needed actions to the other members.
 This also means that all your brick have to share the same local path, again for simplicity and readability.
@@ -210,7 +212,7 @@ Example Playbook
 
     - hosts: servers
       roles:
-         - { role: ansible-role-glusterfs }
+         - ansible-role-glusterfs
 
 License
 -------
